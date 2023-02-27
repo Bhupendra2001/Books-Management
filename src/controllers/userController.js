@@ -49,7 +49,7 @@ const registerUser = async (req, res) => {
         }
       }
      
-if(pincode){
+   if(pincode){
         if (!isValidPincode(pincode)) {
           return res
             .status(400)
@@ -63,11 +63,11 @@ if(pincode){
     const HassPassword = await bcrypt.hash(password, salt)
     req.body["password"] = HassPassword
 
-const salt1=await bcrypt.genSalt(saltRounts)
+
 
 
     const dataStore = await userModel.create(data)
-    return res.status(201).send({ status: true, msg: "userCreate successfully", dataStore })
+    return res.status(201).send({ status: true, msg: "userCreate successfully", data : dataStore })
 
 
   }

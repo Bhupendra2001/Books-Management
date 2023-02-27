@@ -2,7 +2,7 @@ const bookModel = require('../models/bookModel');
 const reviewModel = require('../models/reviewModel')
 const mongoose=require("mongoose")
 
-const { validRating, validName,validDate, isvalidObjectid } = require("../validation/validation")
+const { validRating, validName,validDate } = require("../validation/validation")
 
 const createReview = async function (req, res) {
 
@@ -66,25 +66,25 @@ const createReview = async function (req, res) {
 
 const updateReview = async (req, res) => {
     try {
-        let params1 = req.params.bookId
-        let params2 = req.params.reviewId
+        let bookId = req.params.bookId
+        let reviewId = req.params.reviewId
         let body = req.body
         let bodydata = Object.keys(body)
 
-        if (params1 == undefined || params2 == undefined || Object.keys(body).length == 0 || Object.keys(body).length > 3) return res.status(400).send({ status: false, msg: "Oooh Something is missing" })
+        if (bookId == undefined || reviewId == undefined || Object.keys(body).length == 0 || Object.keys(body).length > 3) return res.status(400).send({ status: false, msg: "Oooh Something is missing" })
         if (!["reviewedBy", "rating", "review"].includes(...bodydata)) return res.status(400).send({ status: false, msg: "Oooh... request body is wrong" })
 
-        if (!mongoose.isValidObjectId(params1) || !mongoose.isValidObjectId(params2)) return res.status(400).send({ status: false, msg: "Oooh... bookId or reviewId are wrong" })
+        if (!mongoose.isValidObjectId(bookId) || !mongoose.isValidObjectId(reviewId)) return res.status(400).send({ status: false, msg: "Oooh... bookId or reviewId are wrong" })
 
-        let book = await bookModel.findOne({ _id: params1})
+        let book = await bookModel.findOne({ _id: bookId})
         if (! book || book.isDeleted) {
             return res.status(400).send({ status: false, msg: "Oooh... Book is not present" })
         }
-        let review = await reviewModel.findOne({ _id: params2, isDeleted: false })
+        let review = await reviewModel.findOne({ _id: reviewId, isDeleted: false })
         if (!review) {
             return res.status(400).send({ status: false, msg: "Oooh... review is not present or Deleted" })
         }
-        if (review.bookId != params1) return res.status(401).send({ status: false, msg: "Oooh... bookId is not maching from reviewid`s book Id" })
+        if (review.bookId != bookId) return res.status(401).send({ status: false, msg: "Oooh... bookId is not maching from reviewid`s book Id" })
 
         let updateReview = await reviewModel.findOneAndUpdate({ _id: review }, {
 
@@ -123,7 +123,7 @@ const updateReview = async (req, res) => {
 const deleteReview = async (req, res) => {
     try {
 
-        // const bookId = req.params.bookId
+         const bookId = req.params.bookId
         const reviewId = req.params.reviewId
 
         if (!bookId) return res.status(400).send({ status: false, message: "Oooh... bookID should be present" })

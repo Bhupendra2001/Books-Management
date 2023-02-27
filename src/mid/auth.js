@@ -30,7 +30,7 @@ const Authrization = async (req, res, next) => {
         let bookId = req.params.bookId
         if (!bookId) return res.status(400).send({ status: false, msg: "Oooh... bookId is not present in params" })
 
-        if (!isValidObjectId(bookId)) return res.status(401).send({ status: false, msg: "!Aree... bookId is not valid" })
+        if (!isValidObjectId(bookId)) return res.status(401).send({ status: false, msg: "!Oooh... bookId is not valid" })
 
         let bookData = await bookModel.findOne({ _id: bookId})
         if (!bookData) return res.status(404).send({ status: false, msg: "Ooh.. book is not present" })

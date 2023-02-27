@@ -2,14 +2,15 @@ const validation = require('../validation/validation')
 const userModels = require('../models/userModel')
 const bookModels = require('../models/bookModel')
 const reviewModels = require("../models/reviewModel")
+const mongoose = require('mongoose')
 const { dad,isvalidObjectid, validISBN, validName, validDate } = validation
-// const moment = require("moment")
+
 
 const createBook = async (req, res) => {
     try {
 
         const data = req.body
-        // const currentDate = moment().format("YYYY-MM-DD")
+       
         const { title, excerpt, userId, ISBN, category, subcategory, releasedAt } = data
         if (Object.keys(data).length == 0) return res.status(400).send({ status: false, msg: "Are ! All fields is mandatory" })
 
@@ -26,8 +27,9 @@ const createBook = async (req, res) => {
 
         if (!validName(excerpt)) return res.status(400).send({ status: false, msg: "Oooh... invalid excerpt" })
 
-        if (!isvalidObjectid(userId)) return res.status(400).send({ status: false, msg: "Oooh... invalid userId" })
-
+           if (!isvalidObjectid(userId)) return res.status(400).send({ status: false, msg: "Oooh... invalid userId" })
+        
+        
         if (!validISBN(ISBN)) { return res.status(400).send({ status: false, msg: "Oooh... please provide a valid ISBN" }) }
 
         if (!validName(category)) return res.status(400).send({ status: false, msg: "Oooh... invalid category" })
@@ -37,6 +39,7 @@ const createBook = async (req, res) => {
         if (!validDate(releasedAt)) return res.status(400).send({ status: false, msg: "Oooh... invalid releasedAt" })
 
 
+        
         const userID = await userModels.findOne({ _id: userId })
         if (!userID) return res.status(404).send({ status: false, msg: "Oooh... user is not present in data" })
 
@@ -45,12 +48,7 @@ const createBook = async (req, res) => {
         const uniqeISBN = await bookModels.findOne({ ISBN })
         if (uniqeISBN) return res.status(400).send({ status: false, msg: "Oooh... ISBN should be unique" })
 
-        // data["releasedAt"] = currentDate
-
-        // if (data["isDeleted"]) {
-        //     data["deletedAt"] = currentDate
-        // }
-
+       
         const savaData = await bookModels.create(data);
         return res.status(201).send({ status: true, msg: "successfully created ", savaData })
     } catch (err) {
@@ -127,22 +125,15 @@ const updateBooks = async function (req, res) {
         let bookId = req.params.bookId;
 
         if (Object.keys(data).length == 0) return res.status(400).send({ status: false, msg: "Areee... body should contain any title,excerpt,ISBN,releasedAt" });
-
-        
         if (data.ISBN) {
             if (!validISBN(data.ISBN)) { return res.status(400).send({ status: false, msg: "Oooo...  please provide a valid ISBN" }) }
         }
-
         if(!dad(data.releasedAt)){return res.send({msg :"release date wrong"})}
-
         if (data.releasedAt) {
             if (!validDate(data.releasedAt)) return res.status(400).send({ status: false, message: "Oooo... Date should be in (YYYY-MM-DD) format", });
         }
         
-
         let validBookId = await bookModels.findOne({ _id: bookId });
-
-
         if (validBookId.title == data.title || validBookId.ISBN == data.ISBN || validBookId.excerpt == data.excerpt || validBookId.releasedAt == data.releasedAt)
             return res.status(400).send({ status: false, msg: "Oooo... title or ISBN or releasedAt or excerpt are Already present" })
 
